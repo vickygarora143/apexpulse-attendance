@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { AttendanceProvider, useAttendance } from './context/AttendanceContext';
+import RoleLogin from './components/RoleLogin';
 import Navbar from './components/Navbar';
 import AdminDashboard from './components/AdminDashboard';
 import TelecallerDashboard from './components/TelecallerDashboard';
@@ -7,23 +8,10 @@ import TeamLeaderDashboard from './components/TeamLeaderDashboard';
 import HRDashboard from './components/HRDashboard';
 import RegularizeModal from './components/RegularizeModal';
 import UploadModal from './components/UploadModal';
-import { 
-  ShieldCheck, 
-  Users, 
-  Clock, 
-  Sparkles, 
-  Info, 
-  X, 
-  CheckCircle2, 
-  Upload, 
-  Calendar,
-  Layers
-} from 'lucide-react';
 
-function AttendanceApp() {
-  const { currentRole, setCurrentRole, attendanceData, currentUser, resetToDefault } = useAttendance();
+function MainApp() {
+  const { authUser, currentRole, currentUser } = useAttendance();
 
-  // Modals state
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [regularizeModalState, setRegularizeModalState] = useState({
     isOpen: false,
@@ -32,7 +20,10 @@ function AttendanceApp() {
     isAdminMode: false
   });
 
-  const [showGuide, setShowGuide] = useState(true);
+  // If user is not authenticated, show the Role-Wise Login Screen
+  if (!authUser) {
+    return <RoleLogin />;
+  }
 
   // Open Direct Admin Regularize
   const handleOpenDirectAdmin = (emp = null, day = null) => {
@@ -64,7 +55,7 @@ function AttendanceApp() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-indigo-600 selection:text-white">
       
       {/* Top Navigation */}
       <Navbar 
@@ -72,7 +63,7 @@ function AttendanceApp() {
         onOpenDirectAdminModal={() => handleOpenDirectAdmin()}
       />
 
-      {/* Main Content Area */}
+      {/* Main Content Area (Clean Light Design) */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
         {/* Dynamic Role Views */}
@@ -105,21 +96,16 @@ function AttendanceApp() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-900/60 border-t border-slate-800/80 py-4 px-4 text-xs text-slate-500">
+      <footer className="bg-white border-t border-slate-200 py-4 px-4 text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-slate-400">ApexPulse</span>
+            <span className="font-bold text-slate-900">ApexPulse</span>
             <span>• Enterprise People Attendance & Regularization Platform</span>
           </div>
-          <div className="flex items-center gap-4 text-[11px]">
-            <button 
-              onClick={resetToDefault} 
-              className="hover:text-slate-300 underline transition-colors"
-            >
-              Reset to Factory Sample Data
-            </button>
+          <div className="flex items-center gap-4 text-[11px] text-slate-500 font-mono">
+            <span>Powered by Cloudflare D1 SQL</span>
             <span>•</span>
-            <span className="text-slate-400 font-mono">Sep 2026 Biometric Ingestion Engine</span>
+            <span>Active User: {authUser.name} ({authUser.role})</span>
           </div>
         </div>
       </footer>
@@ -145,7 +131,7 @@ function AttendanceApp() {
 export default function App() {
   return (
     <AttendanceProvider>
-      <AttendanceApp />
+      <MainApp />
     </AttendanceProvider>
   );
 }

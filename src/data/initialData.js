@@ -1,4 +1,4 @@
-import { parseAttendanceCSV } from '../utils/csvParser';
+import { parseAttendanceCSV } from '../utils/csvParser.js';
 
 export const RAW_CSV_DATA = `Monthly Status Report (Basic Work Duration),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,

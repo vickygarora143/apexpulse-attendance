@@ -10,8 +10,6 @@ import {
   AlertTriangle, 
   Sparkles, 
   Search, 
-  Filter, 
-  ArrowUpRight, 
   FileText,
   History,
   TrendingUp,
@@ -25,7 +23,6 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
     approveRegularization, 
     rejectRegularization,
     selectedEmpId,
-    setSelectedEmpId,
     auditLogs
   } = useAttendance();
 
@@ -76,25 +73,25 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
   };
 
   return (
-    <div className="space-y-6 animate-fadeIn">
+    <div className="space-y-6">
       
-      {/* Top Banner & KPI Cards */}
+      {/* Top Banner & KPI Cards (Clean Light Enterprise) */}
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <div>
-            <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-2">
-              <ShieldCheck className="w-7 h-7 text-emerald-400" />
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <ShieldCheck className="w-7 h-7 text-indigo-600" />
               Chief Admin Attendance Command Hub
             </h1>
-            <p className="text-xs text-slate-400 mt-1">
-              Centralized Regularization Approval Engine • Policy Monitoring • Real-Time Employee Overrides
+            <p className="text-xs text-slate-500 mt-1">
+              Centralized Regularization Approval Engine • Direct Employee Overrides • Policy Monitoring
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => onOpenDirectRegularize(null, null)}
-              className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2"
+              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-2"
             >
               <Sparkles className="w-4 h-4" />
               <span>Direct Day Regularize</span>
@@ -106,75 +103,75 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           
           {/* Workforce */}
-          <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl flex items-center justify-between">
+          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold text-slate-400">Total Workforce</p>
-              <h3 className="text-2xl font-extrabold text-white mt-1">{totalEmployees} Staff</h3>
+              <p className="text-xs font-semibold text-slate-500">Total Workforce</p>
+              <h3 className="text-2xl font-black text-slate-900 mt-0.5">{totalEmployees} Staff</h3>
               <p className="text-[11px] text-slate-400 mt-1">{attendanceData.departments.length} Active Departments</p>
             </div>
-            <div className="p-3 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-              <Users className="w-6 h-6" />
+            <div className="p-3 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100">
+              <Users className="w-5 h-5" />
             </div>
           </div>
 
           {/* Pending Regularizations */}
           <div 
             onClick={() => { setActiveTab('queue'); setQueueFilter('PENDING'); }}
-            className="p-4 rounded-2xl bg-slate-900/80 border border-amber-500/30 hover:border-amber-500 shadow-xl cursor-pointer transition-all flex items-center justify-between group"
+            className="p-4 rounded-xl bg-white border border-amber-300 hover:border-amber-400 shadow-xs cursor-pointer transition-all flex items-center justify-between group"
           >
             <div>
               <div className="flex items-center gap-1.5">
-                <p className="text-xs font-semibold text-amber-400">Pending Regularizations</p>
+                <p className="text-xs font-bold text-amber-700">Pending Regularizations</p>
                 {pendingCount > 0 && (
-                  <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-ping"></span>
+                  <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-ping"></span>
                 )}
               </div>
-              <h3 className="text-2xl font-extrabold text-amber-300 mt-1">{pendingCount} Requests</h3>
-              <p className="text-[11px] text-slate-400 mt-1 group-hover:text-amber-300 transition-colors">
+              <h3 className="text-2xl font-black text-amber-900 mt-0.5">{pendingCount} Requests</h3>
+              <p className="text-[11px] text-amber-600 mt-1 group-hover:underline">
                 Click to review & approve &rarr;
               </p>
             </div>
-            <div className="p-3 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
-              <Clock className="w-6 h-6" />
+            <div className="p-3 rounded-xl bg-amber-50 text-amber-600 border border-amber-200">
+              <Clock className="w-5 h-5" />
             </div>
           </div>
 
           {/* 4-Off Limit Alerts */}
-          <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl flex items-center justify-between">
+          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold text-rose-400">Over-Limit Offs (&gt;4 Offs)</p>
-              <h3 className="text-2xl font-extrabold text-rose-300 mt-1">{overLimitCount} Staff</h3>
-              <p className="text-[11px] text-slate-400 mt-1">Exceeded 4 allowed monthly offs</p>
+              <p className="text-xs font-bold text-rose-700">Over-Limit Offs (&gt;4 Offs)</p>
+              <h3 className="text-2xl font-black text-rose-900 mt-0.5">{overLimitCount} Staff</h3>
+              <p className="text-[11px] text-slate-500 mt-1">Exceeded 4 allowed monthly offs</p>
             </div>
-            <div className="p-3 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
-              <AlertTriangle className="w-6 h-6" />
+            <div className="p-3 rounded-xl bg-rose-50 text-rose-600 border border-rose-200">
+              <AlertTriangle className="w-5 h-5" />
             </div>
           </div>
 
           {/* Active Policies */}
-          <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 shadow-xl flex items-center justify-between">
+          <div className="p-4 rounded-xl bg-white border border-slate-200 shadow-xs flex items-center justify-between">
             <div>
-              <p className="text-xs font-semibold text-emerald-400">Roster Engine Status</p>
-              <h3 className="text-lg font-bold text-white mt-1">100% Enforced</h3>
-              <p className="text-[11px] text-slate-400 mt-1">1st Date WO • Last Sun Working</p>
+              <p className="text-xs font-bold text-emerald-700">Roster Policies</p>
+              <h3 className="text-lg font-black text-emerald-900 mt-0.5">100% Enforced</h3>
+              <p className="text-[11px] text-slate-500 mt-1">1st Date WO • Last Sun Working</p>
             </div>
-            <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <CheckCircle2 className="w-6 h-6" />
+            <div className="p-3 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200">
+              <CheckCircle2 className="w-5 h-5" />
             </div>
           </div>
 
         </div>
       </div>
 
-      {/* Tabs Switcher: Regularization Queue vs Workforce Explorer vs Audit Trail */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-2">
+      {/* Tabs Switcher */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-2">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setActiveTab('queue')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
               activeTab === 'queue'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
             <Clock className="w-4 h-4" />
@@ -190,8 +187,8 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
             onClick={() => setActiveTab('workforce')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
               activeTab === 'workforce'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
             <Users className="w-4 h-4" />
@@ -202,8 +199,8 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
             onClick={() => setActiveTab('audit')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
               activeTab === 'audit'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
             <History className="w-4 h-4" />
@@ -219,7 +216,7 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
             placeholder="Search employee, code, reason..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-9 pr-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:border-indigo-500 w-56 sm:w-64"
+            className="pl-9 pr-3 py-1.5 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-600 w-56 sm:w-64"
           />
         </div>
       </div>
@@ -230,7 +227,7 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
           
           {/* Sub Filters */}
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+            <div className="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-slate-200 text-xs shadow-2xs">
               {[
                 { id: 'PENDING', label: `Pending Approval (${pendingCount})` },
                 { id: 'ALL', label: `All Requests (${regularizations.length})` },
@@ -240,10 +237,10 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
                 <button
                   key={f.id}
                   onClick={() => setQueueFilter(f.id)}
-                  className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                  className={`px-3 py-1.5 rounded-lg font-semibold transition-colors ${
                     queueFilter === f.id
-                      ? 'bg-slate-800 text-white font-semibold'
-                      : 'text-slate-400 hover:text-slate-200'
+                      ? 'bg-indigo-50 text-indigo-700 font-bold border border-indigo-200/60'
+                      : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   {f.label}
@@ -251,17 +248,17 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
               ))}
             </div>
 
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-500">
               Rule: All user regularization requests arrive directly to Admin for 1-click approval or rejection.
             </span>
           </div>
 
-          {/* Queue Cards / Table */}
+          {/* Queue Cards */}
           {filteredQueue.length === 0 ? (
-            <div className="p-12 text-center bg-slate-900/40 rounded-2xl border border-slate-800">
-              <CheckCircle2 className="w-12 h-12 text-emerald-400 mx-auto mb-3 opacity-60" />
-              <h3 className="text-base font-bold text-slate-200">No Regularization Requests in this view</h3>
-              <p className="text-xs text-slate-400 mt-1">
+            <div className="p-12 text-center bg-white rounded-2xl border border-slate-200">
+              <CheckCircle2 className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+              <h3 className="text-base font-bold text-slate-800">No Regularization Requests in this view</h3>
+              <p className="text-xs text-slate-500 mt-1">
                 {queueFilter === 'PENDING' ? 'Great job! All regularization requests have been processed.' : 'No records matching filters.'}
               </p>
             </div>
@@ -270,17 +267,16 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
               {filteredQueue.map(req => {
                 const isPending = req.status === 'PENDING';
                 const isApproved = req.status === 'APPROVED';
-                const isRejected = req.status === 'REJECTED';
 
                 return (
                   <div
                     key={req.id}
-                    className={`p-4 rounded-2xl border transition-all ${
+                    className={`p-4 rounded-xl border transition-all bg-white shadow-xs ${
                       isPending 
-                        ? 'bg-slate-900/90 border-amber-500/40 shadow-lg shadow-amber-500/5' 
+                        ? 'border-amber-300 ring-1 ring-amber-100' 
                         : isApproved 
-                          ? 'bg-slate-900/50 border-teal-500/30' 
-                          : 'bg-slate-900/50 border-rose-500/30'
+                          ? 'border-teal-200' 
+                          : 'border-rose-200'
                     }`}
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -288,38 +284,38 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
                       {/* Left: Employee info & Date */}
                       <div className="space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-bold text-sm text-white">{req.empName}</span>
-                          <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 font-mono text-[11px] border border-slate-700">
+                          <span className="font-bold text-sm text-slate-900">{req.empName}</span>
+                          <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-mono text-[11px] border border-slate-200">
                             {req.empCode}
                           </span>
-                          <span className="text-[11px] text-indigo-400 font-semibold">
+                          <span className="text-[11px] text-indigo-700 font-bold">
                             {req.department}
                           </span>
                           <span className="text-xs text-slate-400">• {req.id}</span>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300">
-                          <div className="flex items-center gap-1 font-semibold text-emerald-400">
+                        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600">
+                          <div className="flex items-center gap-1 font-semibold text-indigo-700">
                             <Clock className="w-3.5 h-3.5" />
                             <span>Target: Day {req.dayNum} ({req.dateFormatted})</span>
                           </div>
                           <div>
-                            Current Status: <span className="font-bold text-rose-400">{req.currentStatus}</span> &rarr; Requested: <span className="font-bold text-emerald-400">{req.requestedStatus}</span>
+                            Current Status: <span className="font-bold text-rose-700">{req.currentStatus}</span> &rarr; Requested: <span className="font-bold text-emerald-700">{req.requestedStatus}</span>
                           </div>
-                          <div className="font-mono text-slate-300">
+                          <div className="font-mono text-slate-700">
                             Timings: <strong>{req.inTime}</strong> to <strong>{req.outTime}</strong> ({req.calcDuration || '09:00'} hrs)
                           </div>
                         </div>
 
                         {/* Reason Note */}
-                        <div className="mt-2 text-xs bg-slate-950/70 p-2.5 rounded-xl border border-slate-800 text-slate-300">
-                          <strong className="text-indigo-300">Reason: </strong>
+                        <div className="mt-2 text-xs bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-slate-800">
+                          <strong className="text-indigo-800 font-bold">Reason: </strong>
                           {req.reason}
                         </div>
 
                         {/* Admin Remark if resolved */}
                         {req.adminRemark && (
-                          <div className="text-[11px] text-teal-300 mt-1">
+                          <div className="text-[11px] text-teal-800 mt-1 font-medium">
                             <strong>Admin Note:</strong> {req.adminRemark}
                           </div>
                         )}
@@ -331,24 +327,24 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
                           <>
                             <button
                               onClick={() => approveRegularization(req.id, 'Approved by Chief Admin')}
-                              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md shadow-emerald-600/30 transition-all flex items-center gap-1.5"
+                              className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5"
                             >
                               <CheckCircle2 className="w-4 h-4" />
                               <span>Approve (Mark Present)</span>
                             </button>
                             <button
                               onClick={() => setRejectingReqId(req.id)}
-                              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-rose-900/60 text-slate-300 hover:text-rose-200 font-medium text-xs border border-slate-700 transition-colors flex items-center gap-1"
+                              className="px-3 py-2 rounded-xl bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-700 font-semibold text-xs border border-slate-200 transition-colors flex items-center gap-1"
                             >
                               <XCircle className="w-4 h-4" />
                               <span>Reject</span>
                             </button>
                           </>
                         ) : (
-                          <span className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 ${
+                          <span className={`px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 border ${
                             isApproved 
-                              ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40' 
-                              : 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                              ? 'bg-teal-50 text-teal-700 border-teal-200' 
+                              : 'bg-rose-50 text-rose-700 border-rose-200'
                           }`}>
                             {isApproved ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
                             <span>{req.status}</span>
@@ -366,21 +362,21 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
         </div>
       )}
 
-      {/* TAB 2: WORKFORCE ATTENDANCE ROSTER & DRILLDOWN */}
+      {/* TAB 2: WORKFORCE ATTENDANCE ROSTER */}
       {activeTab === 'workforce' && (
         <div className="space-y-6">
           
           {/* Department Filter & Summary */}
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-300">Department:</span>
-              <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+              <span className="text-xs font-bold text-slate-700">Department:</span>
+              <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 text-xs shadow-2xs">
                 {['ALL', ...attendanceData.departments].map(d => (
                   <button
                     key={d}
                     onClick={() => setSelectedDept(d)}
-                    className={`px-3 py-1 rounded-lg font-medium transition-colors ${
-                      selectedDept === d ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-white'
+                    className={`px-3 py-1 rounded-lg font-semibold transition-colors ${
+                      selectedDept === d ? 'bg-indigo-600 text-white' : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     {d}
@@ -389,15 +385,15 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
               </div>
             </div>
 
-            <div className="text-xs text-slate-400">
+            <div className="text-xs text-slate-500">
               Showing {filteredWorkforce.length} of {attendanceData.employees.length} Employees
             </div>
           </div>
 
-          {/* Master Workforce Table */}
-          <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-900/70 shadow-xl">
+          {/* Master Workforce Table (Light Design) */}
+          <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-950/80 text-slate-400 border-b border-slate-800 uppercase font-mono text-[10px]">
+              <thead className="bg-slate-50 text-slate-600 border-b border-slate-200 uppercase font-mono text-[10px]">
                 <tr>
                   <th className="py-3 px-4">Employee</th>
                   <th className="py-3 px-3">Department</th>
@@ -410,7 +406,7 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
                   <th className="py-3 px-4 text-center">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 text-slate-200">
+              <tbody className="divide-y divide-slate-100 text-slate-800">
                 {filteredWorkforce.map(emp => {
                   const isExceeded = emp.isOffLimitExceeded;
                   const isSelected = inspectingEmpId === emp.code;
@@ -419,45 +415,45 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
                     <tr 
                       key={emp.code}
                       onClick={() => setInspectingEmpId(emp.code)}
-                      className={`hover:bg-slate-800/40 cursor-pointer transition-colors ${
-                        isSelected ? 'bg-indigo-950/30' : ''
+                      className={`hover:bg-slate-50 cursor-pointer transition-colors ${
+                        isSelected ? 'bg-indigo-50/50' : ''
                       }`}
                     >
                       <td className="py-3 px-4">
-                        <div className="font-bold text-white">{emp.name}</div>
-                        <div className="text-[10px] text-slate-400 font-mono">{emp.code}</div>
+                        <div className="font-bold text-slate-900">{emp.name}</div>
+                        <div className="text-[10px] text-slate-500 font-mono">{emp.code}</div>
                       </td>
                       <td className="py-3 px-3">
-                        <span className="px-2 py-0.5 rounded bg-slate-800 text-indigo-300 font-semibold text-[10px]">
+                        <span className="px-2 py-0.5 rounded bg-slate-100 text-indigo-700 font-bold text-[10px]">
                           {emp.department}
                         </span>
                       </td>
-                      <td className="py-3 px-3 text-slate-300">
+                      <td className="py-3 px-3 text-slate-600">
                         {emp.designation}
                       </td>
                       <td className="py-3 px-3 text-center">
-                        <span className="font-bold text-emerald-400">{emp.presentDays}</span>
+                        <span className="font-bold text-emerald-700">{emp.presentDays}</span>
                       </td>
                       <td className="py-3 px-3 text-center">
-                        <span className={`font-bold ${emp.absentDays > 4 ? 'text-rose-400' : 'text-slate-300'}`}>
+                        <span className={`font-bold ${emp.absentDays > 4 ? 'text-rose-700' : 'text-slate-600'}`}>
                           {emp.absentDays}
                         </span>
                       </td>
-                      <td className="py-3 px-3 text-center text-blue-400 font-medium">
+                      <td className="py-3 px-3 text-center text-blue-700 font-bold">
                         {emp.weekOffDays}
                       </td>
                       <td className="py-3 px-3 text-center">
                         {isExceeded ? (
-                          <span className="px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold text-[10px]">
+                          <span className="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 font-bold text-[10px]">
                             {emp.offsUsed}/4 (Exceeded!)
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold text-[10px]">
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-[10px]">
                             {emp.offsUsed}/4 ({emp.offsRemaining} left)
                           </span>
                         )}
                       </td>
-                      <td className="py-3 px-3 text-right font-mono font-bold text-indigo-300">
+                      <td className="py-3 px-3 text-right font-mono font-bold text-indigo-700">
                         {emp.totalHoursFormatted}
                       </td>
                       <td className="py-3 px-4 text-center">
@@ -466,7 +462,7 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
                             e.stopPropagation();
                             onOpenDirectRegularize(emp, null);
                           }}
-                          className="px-2.5 py-1 rounded-lg bg-indigo-600/30 hover:bg-indigo-600 text-indigo-300 hover:text-white font-medium text-[11px] transition-colors"
+                          className="px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white font-bold text-[11px] transition-colors"
                         >
                           Regularize Day
                         </button>
@@ -480,16 +476,16 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
 
           {/* Inspected Employee Interactive Calendar View */}
           {inspectedEmployee && (
-            <div className="p-6 rounded-2xl border border-slate-800 bg-slate-900/90 shadow-2xl space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+            <div className="p-6 rounded-2xl border border-slate-200 bg-white shadow-xs space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
                 <div>
-                  <h3 className="font-bold text-base text-white flex items-center gap-2">
+                  <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
                     <span>{inspectedEmployee.name} ({inspectedEmployee.code})</span>
-                    <span className="px-2 py-0.5 rounded-md bg-indigo-950 text-indigo-300 text-xs border border-indigo-700/60 font-mono">
+                    <span className="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs border border-indigo-200 font-mono font-bold">
                       {inspectedEmployee.department} • {inspectedEmployee.designation}
                     </span>
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-slate-500">
                     Click any day card below to execute an immediate Admin Regularization Override.
                   </p>
                 </div>
@@ -497,7 +493,7 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => onOpenDirectRegularize(inspectedEmployee, null)}
-                    className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-colors flex items-center gap-1.5"
+                    className="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-colors flex items-center gap-1.5"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>Override Attendance</span>
@@ -518,14 +514,14 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
 
       {/* TAB 3: SYSTEM AUDIT TRAIL */}
       {activeTab === 'audit' && (
-        <div className="p-6 rounded-2xl bg-slate-900/70 border border-slate-800 shadow-xl space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div>
-              <h3 className="font-bold text-base text-white flex items-center gap-2">
-                <History className="w-5 h-5 text-indigo-400" />
+              <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
+                <History className="w-5 h-5 text-indigo-600" />
                 Live Attendance & Regularization Audit Trail
               </h3>
-              <p className="text-xs text-slate-400">Immutable ledger of all approvals, overrides, and CSV ingestions</p>
+              <p className="text-xs text-slate-500">Immutable ledger of all approvals, overrides, and CSV ingestions</p>
             </div>
             <span className="text-xs text-slate-400 font-mono">{auditLogs.length} Events Logged</span>
           </div>
@@ -534,15 +530,15 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
             {auditLogs.map(log => (
               <div
                 key={log.id}
-                className="p-3 rounded-xl bg-slate-950/80 border border-slate-800/80 flex items-start justify-between gap-4 text-xs font-mono"
+                className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-4 text-xs font-mono"
               >
                 <div>
-                  <span className="font-bold text-indigo-400 uppercase tracking-wider mr-2">
+                  <span className="font-bold text-indigo-700 uppercase tracking-wider mr-2">
                     [{log.action}]
                   </span>
-                  <span className="text-slate-200">{log.details}</span>
+                  <span className="text-slate-800">{log.details}</span>
                 </div>
-                <span className="text-slate-500 shrink-0 text-[11px]">{log.timestamp}</span>
+                <span className="text-slate-400 shrink-0 text-[11px]">{log.timestamp}</span>
               </div>
             ))}
           </div>
@@ -551,13 +547,13 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
 
       {/* Rejection Modal confirmation */}
       {rejectingReqId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <XCircle className="w-5 h-5 text-rose-400" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-fadeIn">
+          <div className="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 shadow-xl space-y-4">
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <XCircle className="w-5 h-5 text-rose-600" />
               Reject Regularization Request
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500">
               Please provide the official reason for rejecting this regularization request. It will be reported to the employee.
             </p>
             <textarea
@@ -565,18 +561,18 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
               placeholder="e.g. Punch logs conflict with floor access data..."
               value={rejectionRemark}
               onChange={(e) => setRejectionRemark(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-rose-500"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-500"
             />
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 onClick={() => setRejectingReqId(null)}
-                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium"
+                className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold"
               >
                 Cancel
               </button>
               <button
                 onClick={handleConfirmReject}
-                className="px-4 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold shadow-md shadow-rose-600/30"
+                className="px-4 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold shadow-xs"
               >
                 Confirm Rejection
               </button>
