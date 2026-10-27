@@ -47,12 +47,12 @@ export default {
         if (role) {
           // Role-specific login
           user = await env.DB.prepare(
-            'SELECT * FROM users WHERE (username = ? OR emp_code = ?) AND role = ?'
-          ).bind(username, username.toUpperCase(), role).first();
+            'SELECT * FROM users WHERE (LOWER(username) = LOWER(?) OR UPPER(emp_code) = UPPER(?)) AND UPPER(role) = UPPER(?)'
+          ).bind(username, username, role).first();
         } else {
           user = await env.DB.prepare(
-            'SELECT * FROM users WHERE username = ? OR emp_code = ?'
-          ).bind(username, username.toUpperCase()).first();
+            'SELECT * FROM users WHERE LOWER(username) = LOWER(?) OR UPPER(emp_code) = UPPER(?)'
+          ).bind(username, username).first();
         }
 
         if (!user) {
