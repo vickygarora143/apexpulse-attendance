@@ -8,11 +8,13 @@ import TeamLeaderDashboard from './components/TeamLeaderDashboard';
 import HRDashboard from './components/HRDashboard';
 import RegularizeModal from './components/RegularizeModal';
 import UploadModal from './components/UploadModal';
+import ChangePasswordModal from './components/ChangePasswordModal';
 
 function MainApp() {
   const { authUser, currentRole, currentUser } = useAttendance();
 
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
   const [regularizeModalState, setRegularizeModalState] = useState({
     isOpen: false,
     employee: null,
@@ -61,6 +63,7 @@ function MainApp() {
       <Navbar 
         onOpenUpload={() => setUploadModalOpen(true)}
         onOpenDirectAdminModal={() => handleOpenDirectAdmin()}
+        onOpenChangePassword={() => setChangePasswordModalOpen(true)}
       />
 
       {/* Main Content Area (Clean Light Design) */}
@@ -122,6 +125,12 @@ function MainApp() {
       <UploadModal 
         isOpen={uploadModalOpen}
         onClose={() => setUploadModalOpen(false)}
+      />
+
+      <ChangePasswordModal 
+        isOpen={changePasswordModalOpen || !!authUser?.mustChangePassword}
+        isMandatory={!!authUser?.mustChangePassword}
+        onClose={() => setChangePasswordModalOpen(false)}
       />
 
     </div>

@@ -11,10 +11,11 @@ import {
   LogOut,
   ChevronDown,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  KeyRound
 } from 'lucide-react';
 
-export default function Navbar({ onOpenUpload, onOpenDirectAdminModal }) {
+export default function Navbar({ onOpenUpload, onOpenDirectAdminModal, onOpenChangePassword }) {
   const { 
     currentRole, 
     setCurrentRole, 
@@ -179,7 +180,17 @@ export default function Navbar({ onOpenUpload, onOpenDirectAdminModal }) {
                       </span>
                     </button>
                   ))}
-                  <div className="pt-2 mt-2 border-t border-slate-100">
+                  <div className="pt-2 mt-2 border-t border-slate-100 space-y-1">
+                    <button
+                      onClick={() => {
+                        setUserDropdownOpen(false);
+                        if (onOpenChangePassword) onOpenChangePassword();
+                      }}
+                      className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors"
+                    >
+                      <KeyRound className="w-3.5 h-3.5 text-indigo-600" />
+                      <span>Change Personal Password</span>
+                    </button>
                     <button
                       onClick={() => { logout(); setUserDropdownOpen(false); }}
                       className="w-full flex items-center justify-center gap-1.5 py-1.5 text-xs font-bold text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"

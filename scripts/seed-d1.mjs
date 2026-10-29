@@ -16,18 +16,18 @@ const sqlLines = [];
 
 // 1. Seed Role-wise Users
 const users = [
-  { id: 'USR-001', emp_code: 'GDSM001', username: 'admin', role: 'ADMIN', name: 'Vivek Arora', dept: 'MOHALI', pw: 'Admin@123' },
-  { id: 'USR-002', emp_code: 'GDSM002', username: 'tl_shruti', role: 'TL', name: 'Shruti Goswami', dept: 'MOHALI', pw: 'TL@123' },
-  { id: 'USR-003', emp_code: 'GDSM004', username: 'tl_ashish', role: 'TL', name: 'Ashish', dept: 'MOHALI', pw: 'TL@123' },
-  { id: 'USR-004', emp_code: 'GDSM139', username: 'hr_himani', role: 'HR', name: 'Himani Singh', dept: 'MONEYVIEW', pw: 'HR@123' },
-  { id: 'USR-005', emp_code: 'GDSM092', username: 'hr_sakshi', role: 'HR', name: 'Sakshi', dept: 'MOHALI', pw: 'HR@123' },
-  { id: 'USR-006', emp_code: 'GDSM065', username: 'agent_meenu', role: 'TELECALLER', name: 'Meenu', dept: 'MOHALI', pw: 'Agent@123' },
-  { id: 'USR-007', emp_code: 'GDSM021', username: 'agent_shiwani', role: 'TELECALLER', name: 'Shiwani', dept: 'MOHALI', pw: 'Agent@123' },
-  { id: 'USR-008', emp_code: 'GDSM012', username: 'agent_sumit', role: 'TELECALLER', name: 'Sumit', dept: 'MOHALI', pw: 'Agent@123' },
-  { id: 'USR-009', emp_code: 'GDSM064', username: 'agent_rahul', role: 'TELECALLER', name: 'Rahul', dept: 'MOHALI', pw: 'Agent@123' }
+  { id: 'USR-001', emp_code: 'GDSM001', username: 'admin', role: 'ADMIN', name: 'Vivek Arora', dept: 'MOHALI', pw: 'Admin@123', mustChange: 0 },
+  { id: 'USR-002', emp_code: 'GDSM002', username: 'tl_shruti', role: 'TL', name: 'Shruti Goswami', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
+  { id: 'USR-003', emp_code: 'GDSM004', username: 'tl_ashish', role: 'TL', name: 'Ashish', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
+  { id: 'USR-004', emp_code: 'GDSM139', username: 'hr_himani', role: 'HR', name: 'Himani Singh', dept: 'MONEYVIEW', pw: 'gds@123', mustChange: 1 },
+  { id: 'USR-005', emp_code: 'GDSM092', username: 'hr_sakshi', role: 'HR', name: 'Sakshi', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
+  { id: 'USR-006', emp_code: 'GDSM065', username: 'agent_meenu', role: 'TELECALLER', name: 'Meenu', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
+  { id: 'USR-007', emp_code: 'GDSM021', username: 'agent_shiwani', role: 'TELECALLER', name: 'Shiwani', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
+  { id: 'USR-008', emp_code: 'GDSM012', username: 'agent_sumit', role: 'TELECALLER', name: 'Sumit', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
+  { id: 'USR-009', emp_code: 'GDSM064', username: 'agent_rahul', role: 'TELECALLER', name: 'Rahul', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 }
 ];
 
-// Add entries for remaining agents so any agent can log in with their emp_code and 'Agent@123'
+// Add entries for remaining agents so any agent can log in with their emp_code and 'gds@123'
 parsed.employees.forEach((emp, i) => {
   if (!users.some(u => u.emp_code === emp.code)) {
     users.push({
@@ -37,16 +37,17 @@ parsed.employees.forEach((emp, i) => {
       role: 'TELECALLER',
       name: emp.name,
       dept: emp.department,
-      pw: 'Agent@123'
+      pw: 'gds@123',
+      mustChange: 1
     });
   }
 });
 
 for (const u of users) {
   sqlLines.push(`
-    INSERT INTO users(id, emp_code, username, password_hash, role, name, department)
-    VALUES (${sqlQ(u.id)}, ${sqlQ(u.emp_code)}, ${sqlQ(u.username)}, ${sqlQ(u.pw)}, ${sqlQ(u.role)}, ${sqlQ(u.name)}, ${sqlQ(u.dept)})
-    ON CONFLICT(emp_code) DO UPDATE SET username=excluded.username, role=excluded.role, name=excluded.name, department=excluded.department;
+    INSERT INTO users(id, emp_code, username, password_hash, role, name, department, must_change_password)
+    VALUES (${sqlQ(u.id)}, ${sqlQ(u.emp_code)}, ${sqlQ(u.username)}, ${sqlQ(u.pw)}, ${sqlQ(u.role)}, ${sqlQ(u.name)}, ${sqlQ(u.dept)}, ${u.mustChange || 0})
+    ON CONFLICT(emp_code) DO UPDATE SET username=excluded.username, role=excluded.role, name=excluded.name, department=excluded.department, password_hash=excluded.password_hash, must_change_password=excluded.must_change_password;
   `);
 }
 

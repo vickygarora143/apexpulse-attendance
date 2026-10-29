@@ -78,7 +78,7 @@ export function AttendanceProvider({ children }) {
     }
   }, [authUser]);
 
-  // Real Login
+  // Real Login with 100% Cloudflare D1 verification
   const login = async (username, password, role) => {
     try {
       const res = await fetch('/api/auth/login', {
@@ -94,24 +94,43 @@ export function AttendanceProvider({ children }) {
         if (data.user.empCode) setSelectedEmpId(data.user.empCode);
         localStorage.setItem('apex_auth_user', JSON.stringify(data.user));
         await refreshFromBackend();
-        return { success: true };
+        return { success: true, user: data.user };
       } else {
         return { success: false, error: data.error || 'Invalid credentials' };
       }
     } catch (err) {
-      // Direct local fallback if running offline
-      const roleMap = {
-        'ADMIN': { id: 'USR-001', empCode: 'GDSM001', username, role: 'ADMIN', name: 'Vivek Arora', department: 'MOHALI' },
-        'TL': { id: 'USR-002', empCode: 'GDSM002', username, role: 'TL', name: 'Shruti Goswami', department: 'MOHALI' },
-        'HR': { id: 'USR-004', empCode: 'GDSM139', username, role: 'HR', name: 'Himani Singh', department: 'MONEYVIEW' },
-        'TELECALLER': { id: 'USR-006', empCode: 'GDSM065', username, role: 'TELECALLER', name: 'Meenu', department: 'MOHALI' }
-      };
-      const user = roleMap[role] || roleMap['ADMIN'];
-      setAuthUser(user);
-      setCurrentRole(user.role.toLowerCase());
-      setSelectedEmpId(user.empCode);
-      localStorage.setItem('apex_auth_user', JSON.stringify(user));
-      return { success: true };
+      return { success: false, error: 'Network error or backend unreachable. Please try again.' };
+    }
+  };
+
+  // Real Password Change with Cloudflare D1
+  const changePassword = async (currentPassword, newPassword) => {
+    if (!authUser) {
+      return { success: false, error: 'User is not logged in.' };
+    }
+
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          empCode: authUser.empCode || authUser.username,
+          currentPassword,
+          newPassword
+        })
+      });
+
+      const data = await res.json();
+      if (data.success && data.user) {
+        setAuthUser(data.user);
+        localStorage.setItem('apex_auth_user', JSON.stringify(data.user));
+        await refreshFromBackend();
+        return { success: true, message: data.message };
+      } else {
+        return { success: false, error: data.error || 'Failed to update password' };
+      }
+    } catch (err) {
+      return { success: false, error: 'Network error during password update. Please try again.' };
     }
   };
 
@@ -273,6 +292,7 @@ export function AttendanceProvider({ children }) {
         rejectRegularization,
         directAdminRegularize,
         exportAttendanceCSV,
+        changePassword,
         refreshFromBackend,
         isLoading,
         pendingRequestsCount,

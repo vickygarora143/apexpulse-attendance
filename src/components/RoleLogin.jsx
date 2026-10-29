@@ -44,8 +44,8 @@ export default function RoleLogin() {
       badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
       description: 'Monitor telecaller team roster, track 4-off allowance limits, submit team attendance regularizations.',
       defaultUser: 'tl_shruti',
-      defaultPw: 'TL@123',
-      nameHint: 'Shruti Goswami / Ashish'
+      defaultPw: 'gds@123',
+      nameHint: 'Shruti Goswami / Ashish (First Temp: gds@123)'
     },
     {
       id: 'HR',
@@ -55,8 +55,8 @@ export default function RoleLogin() {
       badgeColor: 'bg-amber-50 text-amber-700 border-amber-200',
       description: 'Review departmental attendance, upload biometric sheets, calculate payable days & payroll summaries.',
       defaultUser: 'hr_himani',
-      defaultPw: 'HR@123',
-      nameHint: 'Himani Singh (Moneyview) / Sakshi'
+      defaultPw: 'gds@123',
+      nameHint: 'Himani Singh / Sakshi (First Temp: gds@123)'
     },
     {
       id: 'TELECALLER',
@@ -66,8 +66,8 @@ export default function RoleLogin() {
       badgeColor: 'bg-blue-50 text-blue-700 border-blue-200',
       description: 'View personal monthly punch timings, track 4 monthly offs balance, request direct attendance regularizations.',
       defaultUser: 'agent_meenu',
-      defaultPw: 'Agent@123',
-      nameHint: 'Meenu (GDSM065) / Shiwani'
+      defaultPw: 'gds@123',
+      nameHint: 'Meenu (GDSM065) / Shiwani (First Temp: gds@123)'
     }
   ];
 
@@ -199,9 +199,20 @@ export default function RoleLogin() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Password
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-semibold text-slate-700">
+                  Password
+                </label>
+                {activeRole !== 'ADMIN' ? (
+                  <span className="text-[10px] text-indigo-600 font-medium">
+                    First-Time Temp: <code className="bg-indigo-50 text-indigo-700 px-1 py-0.5 rounded font-mono font-bold border border-indigo-100">gds@123</code>
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-emerald-600 font-medium">
+                    Admin Default: <code className="bg-emerald-50 text-emerald-700 px-1 py-0.5 rounded font-mono font-bold border border-emerald-100">Admin@123</code>
+                  </span>
+                )}
+              </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                   <Lock className="w-4 h-4" />
@@ -254,29 +265,29 @@ export default function RoleLogin() {
 
               <button
                 type="button"
-                onClick={() => handleQuickDemoLogin('tl_shruti', 'TL@123', 'TL')}
+                onClick={() => handleQuickDemoLogin('tl_shruti', 'gds@123', 'TL')}
                 className="p-2 rounded-lg bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 text-left transition-colors"
               >
                 <div className="font-bold text-slate-800 text-[11px]">👥 Team Leader (TL)</div>
-                <div className="text-[10px] text-slate-500 font-mono">tl_shruti / TL@123</div>
+                <div className="text-[10px] text-slate-500 font-mono">tl_shruti / gds@123</div>
               </button>
 
               <button
                 type="button"
-                onClick={() => handleQuickDemoLogin('hr_himani', 'HR@123', 'HR')}
+                onClick={() => handleQuickDemoLogin('hr_himani', 'gds@123', 'HR')}
                 className="p-2 rounded-lg bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-200 text-left transition-colors"
               >
-                <div className="font-bold text-slate-800 text-[11px]">💼 HR Specialist</div>
-                <div className="text-[10px] text-slate-500 font-mono">hr_himani / HR@123</div>
+                <div className="font-bold text-slate-800 text-[11px]">💼 HR Operations</div>
+                <div className="text-[10px] text-slate-500 font-mono">hr_himani / gds@123</div>
               </button>
 
               <button
                 type="button"
-                onClick={() => handleQuickDemoLogin('agent_meenu', 'Agent@123', 'TELECALLER')}
+                onClick={() => handleQuickDemoLogin('agent_meenu', 'gds@123', 'TELECALLER')}
                 className="p-2 rounded-lg bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 text-left transition-colors"
               >
                 <div className="font-bold text-slate-800 text-[11px]">📞 Telecaller (Meenu)</div>
-                <div className="text-[10px] text-slate-500 font-mono">agent_meenu / Agent@123</div>
+                <div className="text-[10px] text-slate-500 font-mono">agent_meenu / gds@123</div>
               </button>
             </div>
           </div>

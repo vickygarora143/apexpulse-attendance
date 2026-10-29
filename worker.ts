@@ -59,10 +59,12 @@ export default {
           return bad('Invalid employee code or username for selected role', 401);
         }
 
-        // Verify password
-        if (password !== user.password_hash && password !== 'Admin@123' && password !== 'Agent@123' && password !== 'TL@123' && password !== 'HR@123') {
-          return bad('Incorrect password', 401);
+        // Strictly verify password against user's stored individual password in D1
+        if (password !== user.password_hash) {
+          return bad('Incorrect password. Please verify your credentials.', 401);
         }
+
+        const mustChange = user.must_change_password === 1 || user.password_hash === 'gds@123';
 
         return json({
           success: true,
@@ -72,9 +74,79 @@ export default {
             username: user.username,
             role: user.role,
             name: user.name,
-            department: user.department
+            department: user.department,
+            mustChangePassword: mustChange
           },
           token: `APEX-TOKEN-${user.id}-${Date.now()}`
+        });
+      }
+
+      /* ================= 1B. PASSWORD CHANGE (OWN PASSWORD MANAGEMENT) ================= */
+      if (p === '/api/auth/change-password' && m === 'POST') {
+        const body: any = await req.json();
+        const { empCode, currentPassword, newPassword } = body;
+
+        if (!empCode || !currentPassword || !newPassword) {
+          return bad('Missing required parameters: empCode, currentPassword, and newPassword are required.', 400);
+        }
+
+        // Fetch user from D1 database
+        const user: any = await env.DB.prepare(
+          'SELECT * FROM users WHERE UPPER(emp_code) = UPPER(?) OR LOWER(username) = LOWER(?)'
+        ).bind(empCode, empCode).first();
+
+        if (!user) {
+          return bad('User account not found', 404);
+        }
+
+        // Strictly verify current password
+        if (currentPassword !== user.password_hash) {
+          return bad('Current password entered is incorrect. Please check your credentials.', 401);
+        }
+
+        // Validate new password security constraints
+        if (typeof newPassword !== 'string' || newPassword.trim().length < 6) {
+          return bad('New password must be at least 6 characters long.', 400);
+        }
+
+        if (newPassword.trim() === 'gds@123') {
+          return bad('New password cannot be the temporary default password (gds@123). Please choose a private secure password.', 400);
+        }
+
+        if (newPassword.trim() === currentPassword) {
+          return bad('New password cannot be identical to your current password.', 400);
+        }
+
+        const sanitizedPassword = newPassword.trim();
+
+        // 100% Real Update into Cloudflare D1 SQL database
+        await env.DB.prepare(
+          'UPDATE users SET password_hash = ?, must_change_password = 0 WHERE id = ?'
+        ).bind(sanitizedPassword, user.id).run();
+
+        // Real immutable audit log entry in D1
+        const auditId = `AUD-${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 6)}`;
+        await env.DB.prepare(
+          'INSERT INTO audit_logs (id, action, details, actor_code, timestamp) VALUES (?, ?, ?, ?, datetime(\'now\'))'
+        ).bind(
+          auditId,
+          'PASSWORD_CHANGE',
+          `User ${user.name} (${user.emp_code}) updated password from temporary credentials`,
+          user.emp_code
+        ).run();
+
+        return json({
+          success: true,
+          message: 'Password changed successfully! Your account is now secured with your personal password.',
+          user: {
+            id: user.id,
+            empCode: user.emp_code,
+            username: user.username,
+            role: user.role,
+            name: user.name,
+            department: user.department,
+            mustChangePassword: false
+          }
         });
       }
 

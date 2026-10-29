@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
   role TEXT NOT NULL CHECK(role IN ('ADMIN', 'TL', 'HR', 'TELECALLER')),
   name TEXT NOT NULL,
   department TEXT NOT NULL,
+  must_change_password INTEGER DEFAULT 1,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP
 );
 
