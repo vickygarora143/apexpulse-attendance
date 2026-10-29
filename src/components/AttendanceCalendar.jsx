@@ -31,13 +31,13 @@ export default function AttendanceCalendar({ employee, onRegularizeDay, isAdmin 
   const monthsList = [
     { key: '2026-07', label: 'July 2026', days: 31, year: 2026, monthIdx: 6 },
     { key: '2026-08', label: 'August 2026', days: 31, year: 2026, monthIdx: 7 },
-    { key: '2026-09', label: 'September 2026 (Live Biometric)', days: 30, year: 2026, monthIdx: 8, hasRealData: true },
-    { key: '2026-10', label: 'October 2026', days: 31, year: 2026, monthIdx: 9 },
+    { key: '2026-09', label: 'September 2026', days: 30, year: 2026, monthIdx: 8 },
+    { key: '2026-10', label: 'October 2026 (Live Current Month)', days: 29, year: 2026, monthIdx: 9, hasRealData: true },
     { key: '2026-11', label: 'November 2026', days: 30, year: 2026, monthIdx: 10 },
     { key: '2026-12', label: 'December 2026', days: 31, year: 2026, monthIdx: 11 }
   ];
 
-  const currentMonthConfig = monthsList.find(m => m.key === selectedMonthKey) || monthsList[2];
+  const currentMonthConfig = monthsList.find(m => m.key === selectedMonthKey) || monthsList[3];
 
   // Helper: Find all Sundays and last Sunday of selected month
   const getMonthDays = (year, monthIdx, daysInMonth, hasRealData) => {

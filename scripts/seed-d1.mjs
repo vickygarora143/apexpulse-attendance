@@ -16,22 +16,22 @@ const sqlLines = [];
 
 // 1. Seed Role-wise Users
 const users = [
-  { id: 'USR-001', emp_code: 'GDSM001', username: 'admin', role: 'ADMIN', name: 'Vivek Arora', dept: 'MOHALI', pw: 'Admin@123', mustChange: 0 },
-  { id: 'USR-002', emp_code: 'GDSM002', username: 'tl_shruti', role: 'TL', name: 'Shruti Goswami', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
-  { id: 'USR-003', emp_code: 'GDSM004', username: 'tl_ashish', role: 'TL', name: 'Ashish', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
-  { id: 'USR-004', emp_code: 'GDSM139', username: 'hr_himani', role: 'HR', name: 'Himani Singh', dept: 'MONEYVIEW', pw: 'gds@123', mustChange: 1 },
-  { id: 'USR-005', emp_code: 'GDSM092', username: 'hr_sakshi', role: 'HR', name: 'Sakshi', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
-  { id: 'USR-006', emp_code: 'GDSM065', username: 'agent_meenu', role: 'TELECALLER', name: 'Meenu', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
-  { id: 'USR-007', emp_code: 'GDSM021', username: 'agent_shiwani', role: 'TELECALLER', name: 'Shiwani', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
-  { id: 'USR-008', emp_code: 'GDSM012', username: 'agent_sumit', role: 'TELECALLER', name: 'Sumit', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
-  { id: 'USR-009', emp_code: 'GDSM064', username: 'agent_rahul', role: 'TELECALLER', name: 'Rahul', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 }
+  { id: 'USR-GDSM001', emp_code: 'GDSM001', username: 'admin', role: 'ADMIN', name: 'Vivek Arora', dept: 'MOHALI', pw: 'Admin@123', mustChange: 0 },
+  { id: 'USR-GDSM002', emp_code: 'GDSM002', username: 'tl_shruti', role: 'TL', name: 'Shruti Goswami', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
+  { id: 'USR-GDSM004', emp_code: 'GDSM004', username: 'tl_ashish', role: 'TL', name: 'Ashish', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
+  { id: 'USR-GDSM139', emp_code: 'GDSM139', username: 'hr_himani', role: 'HR', name: 'Himani Singh', dept: 'MONEYVIEW', pw: 'gds@123', mustChange: 1 },
+  { id: 'USR-GDSM092', emp_code: 'GDSM092', username: 'hr_sakshi', role: 'HR', name: 'Sakshi', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
+  { id: 'USR-GDSM065', emp_code: 'GDSM065', username: 'agent_meenu', role: 'TELECALLER', name: 'Meenu', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
+  { id: 'USR-GDSM021', emp_code: 'GDSM021', username: 'agent_shiwani', role: 'TELECALLER', name: 'Shiwani', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
+  { id: 'USR-GDSM012', emp_code: 'GDSM012', username: 'agent_sumit', role: 'TELECALLER', name: 'Sumit', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 },
+  { id: 'USR-GDSM064', emp_code: 'GDSM064', username: 'agent_rahul', role: 'TELECALLER', name: 'Rahul', dept: 'MOHALI', pw: 'gds@123', mustChange: 1 }
 ];
 
 // Add entries for remaining agents so any agent can log in with their emp_code and 'gds@123'
-parsed.employees.forEach((emp, i) => {
+parsed.employees.forEach((emp) => {
   if (!users.some(u => u.emp_code === emp.code)) {
     users.push({
-      id: `USR-${(i + 10).toString().padStart(3, '0')}`,
+      id: `USR-${emp.code}`,
       emp_code: emp.code,
       username: emp.code.toLowerCase(),
       role: 'TELECALLER',
@@ -45,9 +45,8 @@ parsed.employees.forEach((emp, i) => {
 
 for (const u of users) {
   sqlLines.push(`
-    INSERT INTO users(id, emp_code, username, password_hash, role, name, department, must_change_password)
-    VALUES (${sqlQ(u.id)}, ${sqlQ(u.emp_code)}, ${sqlQ(u.username)}, ${sqlQ(u.pw)}, ${sqlQ(u.role)}, ${sqlQ(u.name)}, ${sqlQ(u.dept)}, ${u.mustChange || 0})
-    ON CONFLICT(emp_code) DO UPDATE SET username=excluded.username, role=excluded.role, name=excluded.name, department=excluded.department, password_hash=excluded.password_hash, must_change_password=excluded.must_change_password;
+    INSERT OR REPLACE INTO users(id, emp_code, username, password_hash, role, name, department, must_change_password)
+    VALUES (${sqlQ(u.id)}, ${sqlQ(u.emp_code)}, ${sqlQ(u.username)}, ${sqlQ(u.pw)}, ${sqlQ(u.role)}, ${sqlQ(u.name)}, ${sqlQ(u.dept)}, ${u.mustChange || 0});
   `);
 }
 
@@ -67,11 +66,11 @@ for (const emp of parsed.employees) {
   // 3. Seed Attendance Records
   for (let d = 1; d <= parsed.totalDays; d++) {
     const dayObj = emp.attendance[d] || { dayNum: d, dayName: 'D', status: 'A', inTime: '', outTime: '', totalDuration: '00:00' };
-    const dateStr = `2026-09-${String(d).padStart(2, '0')}`;
+    const dateStr = `${parsed.monthKey || '2026-10'}-${String(d).padStart(2, '0')}`;
     const id = `${emp.code}-${dateStr}`;
 
     const is1stWO = d === 1 ? 1 : 0;
-    const isLastSun = (dayObj.isLastSundayWorking || d === 27) ? 1 : 0;
+    const isLastSun = (dayObj.isLastSundayWorking || d === (parsed.lastSundayNum || 25)) ? 1 : 0;
 
     sqlLines.push(`
       INSERT INTO attendance_records(id, emp_code, date, day_num, day_name, status, in_time, out_time, total_duration, is_regularized, is_1st_day_wo, is_last_sunday_working)
@@ -90,12 +89,12 @@ for (const emp of parsed.employees) {
 // 4. Seed Real Initial Regularizations
 const sampleRegs = [
   {
-    id: 'REG-2026-001',
+    id: 'REG-2026-101',
     emp_code: 'GDSM002',
     emp_name: 'SHRUTI GOSWAMI',
     dept: 'MOHALI',
-    date: '2026-09-04',
-    day_num: 4,
+    date: '2026-10-02',
+    day_num: 2,
     current_status: 'A',
     requested_status: 'P',
     req_in: '09:30',
@@ -105,12 +104,12 @@ const sampleRegs = [
     status: 'PENDING'
   },
   {
-    id: 'REG-2026-002',
+    id: 'REG-2026-102',
     emp_code: 'GDSM065',
     emp_name: 'MEENU',
     dept: 'MOHALI',
-    date: '2026-09-04',
-    day_num: 4,
+    date: '2026-10-14',
+    day_num: 14,
     current_status: 'A',
     requested_status: 'P',
     req_in: '09:25',
@@ -120,11 +119,11 @@ const sampleRegs = [
     status: 'PENDING'
   },
   {
-    id: 'REG-2026-003',
+    id: 'REG-2026-103',
     emp_code: 'GDSM015',
     emp_name: 'BEANT KAUR',
     dept: 'MOHALI',
-    date: '2026-09-15',
+    date: '2026-10-15',
     day_num: 15,
     current_status: 'A',
     requested_status: 'P',
@@ -147,7 +146,7 @@ for (const r of sampleRegs) {
 // 5. Initial Audit Log
 sqlLines.push(`
   INSERT INTO audit_logs(id, action, details, actor_code)
-  VALUES ('AUD-001', 'SYSTEM_INIT', 'ApexPulse Database Initialized with September 2026 Biometric Data. Rules active: Day 1 WO, Last Sunday Working, 4 Monthly Offs Quota.', 'SYSTEM');
+  VALUES ('AUD-OCT-001', 'SYSTEM_INIT', 'ApexPulse Database Initialized with October 01-29 2026 Biometric Data. Rules active: Day 1 WO, Last Sunday Working, 4 Monthly Offs Quota.', 'SYSTEM');
 `);
 
 const finalSql = sqlLines.join('\n');

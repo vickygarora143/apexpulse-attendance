@@ -224,12 +224,19 @@ export default {
         });
 
         const departments = Array.from(new Set(employees.map((e: any) => e.department)));
+        const maxDayNum = records.length > 0 ? Math.max(...records.map((r: any) => r.day_num)) : 29;
+        const firstRecord = records[0];
+        const monthKey = firstRecord && firstRecord.date ? firstRecord.date.substring(0, 7) : '2026-10';
+        const dateRange = `Oct 01 2026 To Oct ${String(maxDayNum).padStart(2, '0')} 2026`;
 
         return json({
           success: true,
-          dateRange: 'Sep 01 2026 To Sep 30 2026',
+          dateRange,
+          detectedMonth: 'October',
+          detectedYear: 2026,
+          monthKey,
           company: 'MOHALI & MONEYVIEW',
-          totalDays: 30,
+          totalDays: maxDayNum,
           departments,
           employees: enriched
         });
@@ -270,10 +277,10 @@ export default {
         const emp: any = await env.DB.prepare('SELECT * FROM employees WHERE emp_code = ?').bind(empCode).first();
         if (!emp) return bad('Employee record not found', 404);
 
-        const dateStr = `2026-09-${String(dayNum).padStart(2, '0')}`;
         const dayRecord: any = await env.DB.prepare(
-          'SELECT * FROM attendance_records WHERE emp_code = ? AND date = ?'
-        ).bind(empCode, dateStr).first();
+          'SELECT * FROM attendance_records WHERE emp_code = ? AND day_num = ? LIMIT 1'
+        ).bind(empCode, dayNum).first();
+        const dateStr = dayRecord ? dayRecord.date : `2026-10-${String(dayNum).padStart(2, '0')}`;
 
         // Calculate hours
         let calcDuration = '09:00';
@@ -394,7 +401,10 @@ export default {
         const body: any = await req.json();
         const { empCode, dayNum, status, inTime, outTime, totalDuration, remarks, actorCode } = body;
 
-        const dateStr = `2026-09-${String(dayNum).padStart(2, '0')}`;
+        const dayRecord: any = await env.DB.prepare(
+          'SELECT * FROM attendance_records WHERE emp_code = ? AND day_num = ? LIMIT 1'
+        ).bind(empCode, dayNum).first();
+        const dateStr = dayRecord ? dayRecord.date : `2026-10-${String(dayNum).padStart(2, '0')}`;
         await env.DB.prepare(`
           UPDATE attendance_records
           SET status = ?,
