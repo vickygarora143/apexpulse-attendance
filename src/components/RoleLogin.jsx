@@ -236,16 +236,6 @@ export default function RoleLogin() {
 
         </div>
 
-        {/* Policy footer callout */}
-        <div className="mt-4 text-center text-[11px] text-slate-500 space-y-1">
-          <p>
-            Roster Policies Active: <strong>1st Day = Week Off</strong> • <strong>Sundays = Week Off (Except Last Sunday = Working)</strong> • <strong>4 Monthly Offs Quota</strong>
-          </p>
-          <p className="font-mono text-slate-400">
-            Powered by Cloudflare D1 SQL Engine • Enterprise Live Deployment
-          </p>
-        </div>
-
       </div>
 
     </div>
