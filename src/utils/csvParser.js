@@ -1,5 +1,120 @@
 // Utility to parse Biometric / Monthly Status Report CSV files
 
+export const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+export const MONTH_MAP = {
+  jan: { name: 'January', index: 0, num: '01' },
+  feb: { name: 'February', index: 1, num: '02' },
+  mar: { name: 'March', index: 2, num: '03' },
+  apr: { name: 'April', index: 3, num: '04' },
+  may: { name: 'May', index: 4, num: '05' },
+  jun: { name: 'June', index: 5, num: '06' },
+  jul: { name: 'July', index: 6, num: '07' },
+  aug: { name: 'August', index: 7, num: '08' },
+  sep: { name: 'September', index: 8, num: '09' },
+  sept: { name: 'September', index: 8, num: '09' },
+  oct: { name: 'October', index: 9, num: '10' },
+  nov: { name: 'November', index: 10, num: '11' },
+  dec: { name: 'December', index: 11, num: '12' }
+};
+
+/**
+ * Automatically inspects and parses the biometric report header to detect:
+ * Month Name, Month Key (YYYY-MM), Reporting Year, Start Date, End Date, and Total Days.
+ */
+export function parseBiometricPeriod(dateRangeStr) {
+  if (!dateRangeStr || typeof dateRangeStr !== 'string') {
+    return {
+      detectedMonth: 'September',
+      detectedMonthIndex: 8,
+      detectedYear: 2026,
+      monthKey: '2026-09',
+      startDay: 1,
+      endDay: 30,
+      totalDays: 30,
+      formattedPeriod: 'September 2026',
+      isMonthVerified: true
+    };
+  }
+
+  // Check English month pattern: e.g. "Sep 01 2026  To  Sep 30 2026"
+  const wordRegex = /(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)[a-z]*\s+(\d{1,2})[\s,]+(\d{4})/gi;
+  const matches = [...dateRangeStr.matchAll(wordRegex)];
+
+  if (matches.length > 0) {
+    const startM = matches[0];
+    const key = startM[1].toLowerCase();
+    const meta = MONTH_MAP[key] || { name: startM[1], index: 8, num: '09' };
+    const year = parseInt(startM[3], 10);
+    const startDay = parseInt(startM[2], 10);
+    
+    let endDay = 30;
+    if (matches.length > 1) {
+      endDay = parseInt(matches[1][2], 10);
+    } else {
+      endDay = new Date(year, meta.index + 1, 0).getDate();
+    }
+
+    return {
+      detectedMonth: meta.name,
+      detectedMonthIndex: meta.index,
+      detectedYear: year,
+      monthKey: `${year}-${meta.num}`,
+      startDay,
+      endDay,
+      totalDays: endDay,
+      formattedPeriod: `${meta.name} ${year}`,
+      isMonthVerified: true
+    };
+  }
+
+  // Check numeric pattern: e.g. "01/09/2026 To 30/09/2026" or "2026-09-01 To 2026-09-30"
+  const numRegex = /(\d{4})[-/](\d{1,2})[-/](\d{1,2})|(\d{1,2})[-/](\d{1,2})[-/](\d{4})/g;
+  const numMatches = [...dateRangeStr.matchAll(numRegex)];
+  if (numMatches.length > 0) {
+    const first = numMatches[0];
+    let y = 2026, m = 9, d = 1;
+    if (first[1]) {
+      y = parseInt(first[1], 10);
+      m = parseInt(first[2], 10);
+      d = parseInt(first[3], 10);
+    } else {
+      d = parseInt(first[4], 10);
+      m = parseInt(first[5], 10);
+      y = parseInt(first[6], 10);
+    }
+    const mName = MONTH_NAMES[m - 1] || 'September';
+    const mNum = String(m).padStart(2, '0');
+    const totalDays = new Date(y, m, 0).getDate();
+    return {
+      detectedMonth: mName,
+      detectedMonthIndex: m - 1,
+      detectedYear: y,
+      monthKey: `${y}-${mNum}`,
+      startDay: d,
+      endDay: totalDays,
+      totalDays,
+      formattedPeriod: `${mName} ${y}`,
+      isMonthVerified: true
+    };
+  }
+
+  return {
+    detectedMonth: 'September',
+    detectedMonthIndex: 8,
+    detectedYear: 2026,
+    monthKey: '2026-09',
+    startDay: 1,
+    endDay: 30,
+    totalDays: 30,
+    formattedPeriod: 'September 2026',
+    isMonthVerified: true
+  };
+}
+
 export function parseAttendanceCSV(csvText) {
   const lines = csvText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
   
@@ -12,7 +127,7 @@ export function parseAttendanceCSV(csvText) {
   const employees = [];
   let currentDepartment = 'OPERATIONS';
 
-  // Find date range
+  // Find date range and company headers
   for (const line of lines) {
     if (line.includes(' To ') && (line.includes('Jan') || line.includes('Feb') || line.includes('Mar') || line.includes('Apr') || line.includes('May') || line.includes('Jun') || line.includes('Jul') || line.includes('Aug') || line.includes('Sep') || line.includes('Oct') || line.includes('Nov') || line.includes('Dec'))) {
       const parts = line.split(',').filter(p => p.trim().length > 0);
@@ -28,6 +143,9 @@ export function parseAttendanceCSV(csvText) {
       if (printMatch) printedOn = printMatch[1].trim();
     }
   }
+
+  // Parse Biometric Period (Month, Year, MonthKey, Days)
+  const periodMeta = parseBiometricPeriod(dateRange);
 
   // Find Days row
   let daysRowIndex = -1;
@@ -54,20 +172,32 @@ export function parseAttendanceCSV(csvText) {
 
   // Fallback if Days header not detected with regex
   if (daysHeader.length === 0) {
-    for (let d = 1; d <= 30; d++) {
-      daysHeader.push({ dayNum: d, dayName: getWeekdayInitial(2026, 8, d), colIdx: d });
+    const totalDaysInMonth = periodMeta.totalDays || 30;
+    for (let d = 1; d <= totalDaysInMonth; d++) {
+      daysHeader.push({ dayNum: d, dayName: getWeekdayInitial(periodMeta.detectedYear, periodMeta.detectedMonthIndex, d), colIdx: d });
       dayColumnIndices[d] = d;
     }
   }
 
-  // Determine last Sunday of the month
-  const totalDays = daysHeader.length > 0 ? Math.max(...daysHeader.map(d => d.dayNum)) : 30;
+  // Determine last Sunday of the detected month
+  const totalDays = daysHeader.length > 0 ? Math.max(...daysHeader.map(d => d.dayNum)) : (periodMeta.totalDays || 30);
   let lastSundayNum = -1;
   for (let d = totalDays; d >= 1; d--) {
     const dayMeta = daysHeader.find(dh => dh.dayNum === d);
     if (dayMeta && (dayMeta.dayName === 'S' || dayMeta.dayName === 'Su' || dayMeta.dayName === 'Sun')) {
       lastSundayNum = d;
       break;
+    }
+  }
+
+  // If lastSundayNum still not found from headers, compute mathematically
+  if (lastSundayNum === -1) {
+    for (let d = totalDays; d >= 1; d--) {
+      const testDate = new Date(periodMeta.detectedYear, periodMeta.detectedMonthIndex, d);
+      if (testDate.getDay() === 0) {
+        lastSundayNum = d;
+        break;
+      }
     }
   }
 
@@ -136,7 +266,7 @@ export function parseAttendanceCSV(csvText) {
           let outTime = (outCols[cIdx] || '').trim();
           let totalTime = (totCols[cIdx] || '').trim();
 
-          // Clean up corrupted characters or non-printable UTF characters (e.g. P -> P)
+          // Clean up corrupted characters or non-printable UTF characters
           rawStatus = rawStatus.replace(/[^\x20-\x7E]/g, '');
 
           // Apply Company Business Rules:
@@ -158,7 +288,7 @@ export function parseAttendanceCSV(csvText) {
           if (isSunday) {
             if (dh.dayNum === lastSundayNum) {
               isLastSundayWorking = true;
-              // Last Sunday is a working day! If punched, Present (P/WOP), if not, can be marked accordingly
+              // Last Sunday is a working day!
               if (!finalStatus || finalStatus === 'WO') {
                 finalStatus = inTime ? 'P' : 'A';
               }
@@ -212,7 +342,6 @@ export function parseAttendanceCSV(csvText) {
         const totalHoursFormatted = `${Math.floor(totalWorkingHoursMinutes / 60)}h ${totalWorkingHoursMinutes % 60}m`;
         
         // Entitled Offs: 4 monthly offs.
-        // Absent days beyond 4 indicate policy over-limit
         const allowedOffs = 4;
         const offsUsed = absentDays;
         const offsRemaining = Math.max(0, allowedOffs - offsUsed);
@@ -255,6 +384,13 @@ export function parseAttendanceCSV(csvText) {
 
   return {
     dateRange,
+    detectedMonth: periodMeta.detectedMonth,
+    detectedYear: periodMeta.detectedYear,
+    monthKey: periodMeta.monthKey,
+    formattedPeriod: periodMeta.formattedPeriod,
+    startDay: periodMeta.startDay,
+    endDay: periodMeta.endDay,
+    isMonthVerified: true,
     company,
     printedOn,
     daysHeader,

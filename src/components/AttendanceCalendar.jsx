@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAttendance } from '../context/AttendanceContext';
 import { 
   Clock, 
   CheckCircle2, 
@@ -13,7 +14,15 @@ import {
 } from 'lucide-react';
 
 export default function AttendanceCalendar({ employee, onRegularizeDay, isAdmin }) {
-  const [selectedMonthKey, setSelectedMonthKey] = useState('2026-09'); // Default baseline month from D1
+  const { attendanceData } = useAttendance();
+  const defaultKey = attendanceData?.monthKey || '2026-09';
+  const [selectedMonthKey, setSelectedMonthKey] = useState(defaultKey);
+
+  useEffect(() => {
+    if (attendanceData?.monthKey) {
+      setSelectedMonthKey(attendanceData.monthKey);
+    }
+  }, [attendanceData?.monthKey]);
 
   if (!employee || !employee.attendance) {
     return <div className="p-8 text-center text-slate-500 bg-white rounded-xl border border-slate-200">No attendance data available.</div>;
@@ -22,7 +31,7 @@ export default function AttendanceCalendar({ employee, onRegularizeDay, isAdmin 
   const monthsList = [
     { key: '2026-07', label: 'July 2026', days: 31, year: 2026, monthIdx: 6 },
     { key: '2026-08', label: 'August 2026', days: 31, year: 2026, monthIdx: 7 },
-    { key: '2026-09', label: 'September 2026 (Live D1)', days: 30, year: 2026, monthIdx: 8, hasRealData: true },
+    { key: '2026-09', label: 'September 2026 (Live Biometric)', days: 30, year: 2026, monthIdx: 8, hasRealData: true },
     { key: '2026-10', label: 'October 2026', days: 31, year: 2026, monthIdx: 9 },
     { key: '2026-11', label: 'November 2026', days: 30, year: 2026, monthIdx: 10 },
     { key: '2026-12', label: 'December 2026', days: 31, year: 2026, monthIdx: 11 }

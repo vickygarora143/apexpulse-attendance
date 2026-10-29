@@ -282,6 +282,7 @@ export function AttendanceProvider({ children }) {
         currentRole,
         setCurrentRole,
         attendanceData,
+        setAttendanceData,
         selectedEmpId,
         setSelectedEmpId,
         currentUser,
