@@ -8,19 +8,19 @@ import {
   ArrowRight, 
   Lock, 
   User, 
-  Building2, 
-  CheckCircle2, 
   AlertCircle,
-  Sparkles,
-  Calendar
+  Calendar,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 export default function RoleLogin() {
   const { login } = useAttendance();
 
   const [activeRole, setActiveRole] = useState('ADMIN'); // 'ADMIN' | 'TL' | 'HR' | 'TELECALLER'
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('Admin@123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -31,10 +31,8 @@ export default function RoleLogin() {
       icon: ShieldCheck,
       badge: 'Master Control',
       badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-      description: 'Approve & reject regularizations, perform direct attendance overrides, manage workforce compliance.',
-      defaultUser: 'admin',
-      defaultPw: 'Admin@123',
-      nameHint: 'Vivek Arora (Operations Admin)'
+      description: 'Review and approve/reject all attendance regularizations, perform direct attendance overrides, manage workforce compliance.',
+      userPlaceholder: 'admin'
     },
     {
       id: 'TL',
@@ -42,10 +40,8 @@ export default function RoleLogin() {
       icon: Users,
       badge: 'Supervisory',
       badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-      description: 'Monitor telecaller team roster, track 4-off allowance limits, submit team attendance regularizations.',
-      defaultUser: 'tl_shruti',
-      defaultPw: 'gds@123',
-      nameHint: 'Shruti Goswami / Ashish (First Temp: gds@123)'
+      description: 'Supervise telecaller team roster, track 4-off allowance limits, submit attendance regularizations to Admin.',
+      userPlaceholder: 'tl_shruti or GDSM002'
     },
     {
       id: 'HR',
@@ -53,10 +49,8 @@ export default function RoleLogin() {
       icon: UserCheck,
       badge: 'Company Wide',
       badgeColor: 'bg-amber-50 text-amber-700 border-amber-200',
-      description: 'Review departmental attendance, upload biometric sheets, calculate payable days & payroll summaries.',
-      defaultUser: 'hr_himani',
-      defaultPw: 'gds@123',
-      nameHint: 'Himani Singh / Sakshi (First Temp: gds@123)'
+      description: 'Review departmental attendance (Mohali & Moneyview), calculate payable days & payroll summaries, upload biometric sheets.',
+      userPlaceholder: 'hr_himani or GDSM139'
     },
     {
       id: 'TELECALLER',
@@ -64,10 +58,8 @@ export default function RoleLogin() {
       icon: Clock,
       badge: 'Self-Service',
       badgeColor: 'bg-blue-50 text-blue-700 border-blue-200',
-      description: 'View personal monthly punch timings, track 4 monthly offs balance, request direct attendance regularizations.',
-      defaultUser: 'agent_meenu',
-      defaultPw: 'gds@123',
-      nameHint: 'Meenu (GDSM065) / Shiwani (First Temp: gds@123)'
+      description: 'Personal 30-day attendance calendar, track 4 monthly offs balance, request direct attendance regularizations to Admin.',
+      userPlaceholder: 'agent_meenu or GDSM065'
     }
   ];
 
@@ -76,31 +68,26 @@ export default function RoleLogin() {
   const handleRoleTabChange = (roleId) => {
     setActiveRole(roleId);
     setErrorMsg('');
-    const target = roles.find(r => r.id === roleId);
-    if (target) {
-      setUsername(target.defaultUser);
-      setPassword(target.defaultPw);
-    }
+    setUsername('');
+    setPassword('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
-    setLoading(true);
+    
+    if (!username.trim() || !password.trim()) {
+      setErrorMsg('Please enter both your employee code/username and password.');
+      return;
+    }
 
-    const res = await login(username, password, activeRole);
+    setLoading(true);
+    const res = await login(username.trim(), password, activeRole);
     setLoading(false);
 
     if (!res.success) {
-      setErrorMsg(res.error || 'Authentication failed. Please verify credentials.');
+      setErrorMsg(res.error || 'Authentication failed. Please verify your credentials.');
     }
-  };
-
-  const handleQuickDemoLogin = (userCode, pw, roleId) => {
-    setActiveRole(roleId);
-    setUsername(userCode);
-    setPassword(pw);
-    login(userCode, pw, roleId);
   };
 
   return (
@@ -192,7 +179,7 @@ export default function RoleLogin() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder="e.g. admin or GDSM065"
+                  placeholder={`e.g. ${currentRoleConfig.userPlaceholder}`}
                   className="block w-full pl-9 pr-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all"
                 />
               </div>
@@ -203,13 +190,9 @@ export default function RoleLogin() {
                 <label className="block text-xs font-semibold text-slate-700">
                   Password
                 </label>
-                {activeRole !== 'ADMIN' ? (
-                  <span className="text-[10px] text-indigo-600 font-medium">
-                    First-Time Temp: <code className="bg-indigo-50 text-indigo-700 px-1 py-0.5 rounded font-mono font-bold border border-indigo-100">gds@123</code>
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-emerald-600 font-medium">
-                    Admin Default: <code className="bg-emerald-50 text-emerald-700 px-1 py-0.5 rounded font-mono font-bold border border-emerald-100">Admin@123</code>
+                {activeRole !== 'ADMIN' && (
+                  <span className="text-[10px] text-slate-500">
+                    First-time temp password: <span className="font-mono font-semibold text-indigo-600">gds@123</span>
                   </span>
                 )}
               </div>
@@ -218,12 +201,20 @@ export default function RoleLogin() {
                   <Lock className="w-4 h-4" />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-9 pr-3 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all"
+                  placeholder="Enter your confidential password"
+                  className="block w-full pl-9 pr-10 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:border-transparent transition-all"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
@@ -243,55 +234,6 @@ export default function RoleLogin() {
             </button>
           </form>
 
-          {/* Quick 1-Click Credentials Tester */}
-          <div className="mt-8 pt-6 border-t border-slate-100 text-xs">
-            <div className="flex items-center justify-between mb-2">
-              <span className="font-semibold text-slate-700 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                <span>Instant Demo Login (1-Click):</span>
-              </span>
-              <span className="text-[10px] text-slate-400">Cloudflare D1 Verified</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('admin', 'Admin@123', 'ADMIN')}
-                className="p-2 rounded-lg bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-200 text-left transition-colors"
-              >
-                <div className="font-bold text-slate-800 text-[11px]">🛡️ Chief Admin</div>
-                <div className="text-[10px] text-slate-500 font-mono">admin / Admin@123</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('tl_shruti', 'gds@123', 'TL')}
-                className="p-2 rounded-lg bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 text-left transition-colors"
-              >
-                <div className="font-bold text-slate-800 text-[11px]">👥 Team Leader (TL)</div>
-                <div className="text-[10px] text-slate-500 font-mono">tl_shruti / gds@123</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('hr_himani', 'gds@123', 'HR')}
-                className="p-2 rounded-lg bg-slate-50 hover:bg-amber-50 border border-slate-200 hover:border-amber-200 text-left transition-colors"
-              >
-                <div className="font-bold text-slate-800 text-[11px]">💼 HR Operations</div>
-                <div className="text-[10px] text-slate-500 font-mono">hr_himani / gds@123</div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleQuickDemoLogin('agent_meenu', 'gds@123', 'TELECALLER')}
-                className="p-2 rounded-lg bg-slate-50 hover:bg-blue-50 border border-slate-200 hover:border-blue-200 text-left transition-colors"
-              >
-                <div className="font-bold text-slate-800 text-[11px]">📞 Telecaller (Meenu)</div>
-                <div className="text-[10px] text-slate-500 font-mono">agent_meenu / gds@123</div>
-              </button>
-            </div>
-          </div>
-
         </div>
 
         {/* Policy footer callout */}
@@ -300,7 +242,7 @@ export default function RoleLogin() {
             Roster Policies Active: <strong>1st Day = Week Off</strong> • <strong>Sundays = Week Off (Except Last Sunday = Working)</strong> • <strong>4 Monthly Offs Quota</strong>
           </p>
           <p className="font-mono text-slate-400">
-            Powered by Cloudflare D1 SQL Engine • Live Edge Deployment
+            Powered by Cloudflare D1 SQL Engine • Enterprise Live Deployment
           </p>
         </div>
 
