@@ -13,8 +13,19 @@ import {
   FileText,
   History,
   TrendingUp,
-  UserX
+  UserX,
+  ShieldAlert,
+  Activity,
+  Sliders,
+  BarChart2
 } from 'lucide-react';
+
+import ApprovalHeatmapRecommender from './ai/ApprovalHeatmapRecommender';
+import AnomalyDetector from './ai/AnomalyDetector';
+import AttritionPredictor from './ai/AttritionPredictor';
+import RosterOptimizer from './ai/RosterOptimizer';
+import WorkforcePlanner from './ai/WorkforcePlanner';
+import ReportGenerator from './ai/ReportGenerator';
 
 export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForRegularize }) {
   const { 
@@ -165,17 +176,17 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
 
       {/* Tabs Switcher */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-2">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
           <button
             onClick={() => setActiveTab('queue')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
               activeTab === 'queue'
                 ? 'bg-indigo-600 text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
             <Clock className="w-4 h-4" />
-            <span>Regularization Requests Queue</span>
+            <span>Regularization Queue</span>
             {pendingCount > 0 && (
               <span className="px-1.5 py-0.5 text-[10px] bg-amber-400 text-slate-950 font-black rounded-full">
                 {pendingCount}
@@ -184,27 +195,63 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
           </button>
 
           <button
+            onClick={() => setActiveTab('anomalies')}
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              activeTab === 'anomalies'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <ShieldAlert className="w-4 h-4 text-rose-500" />
+            <span>Biometric Anomalies</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('ai_intelligence')}
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              activeTab === 'ai_intelligence'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <Activity className="w-4 h-4 text-indigo-500" />
+            <span>Workforce & Attrition AI</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('reports')}
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              activeTab === 'reports'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+            }`}
+          >
+            <BarChart2 className="w-4 h-4 text-emerald-600" />
+            <span>AI Reports</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('workforce')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
               activeTab === 'workforce'
                 ? 'bg-indigo-600 text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
             <Users className="w-4 h-4" />
-            <span>Workforce Attendance Roster ({totalEmployees})</span>
+            <span>Workforce Roster ({totalEmployees})</span>
           </button>
 
           <button
             onClick={() => setActiveTab('audit')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
               activeTab === 'audit'
                 ? 'bg-indigo-600 text-white shadow-xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
             <History className="w-4 h-4" />
-            <span>System Audit Trail</span>
+            <span>Audit Trail</span>
           </button>
         </div>
 
@@ -313,6 +360,11 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
                           {req.reason}
                         </div>
 
+                        {/* AI Heatmap & Approval Recommendation */}
+                        {isPending && (
+                          <ApprovalHeatmapRecommender request={req} />
+                        )}
+
                         {/* Admin Remark if resolved */}
                         {req.adminRemark && (
                           <div className="text-[11px] text-teal-800 mt-1 font-medium">
@@ -360,6 +412,25 @@ export default function AdminDashboard({ onOpenDirectRegularize, onOpenDayForReg
           )}
 
         </div>
+      )}
+
+      {/* TAB: BIOMETRIC ANOMALIES (AI DETECTOR) */}
+      {activeTab === 'anomalies' && (
+        <AnomalyDetector onOpenRegularizeModal={onOpenDirectRegularize} />
+      )}
+
+      {/* TAB: WORKFORCE & ATTRITION AI INTELLIGENCE */}
+      {activeTab === 'ai_intelligence' && (
+        <div className="space-y-6">
+          <AttritionPredictor />
+          <WorkforcePlanner />
+          <RosterOptimizer />
+        </div>
+      )}
+
+      {/* TAB: AI REPORTS & PROMPTS */}
+      {activeTab === 'reports' && (
+        <ReportGenerator />
       )}
 
       {/* TAB 2: WORKFORCE ATTENDANCE ROSTER */}

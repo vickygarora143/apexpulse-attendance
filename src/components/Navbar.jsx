@@ -14,6 +14,7 @@ import {
   RefreshCw,
   KeyRound
 } from 'lucide-react';
+import SmartReminders from './ai/SmartReminders';
 
 export default function Navbar({ onOpenUpload, onOpenDirectAdminModal, onOpenChangePassword }) {
   const { 
@@ -101,6 +102,9 @@ export default function Navbar({ onOpenUpload, onOpenDirectAdminModal, onOpenCha
             >
               <RefreshCw className={`w-4 h-4 text-slate-600 ${isLoading ? 'animate-spin' : ''}`} />
             </button>
+
+            {/* Smart Reminders Notification Center */}
+            <SmartReminders />
 
             {/* Direct Admin Quick Action if in Admin role */}
             {currentRole === 'admin' && (

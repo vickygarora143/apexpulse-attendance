@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useAttendance } from '../context/AttendanceContext';
-import { X, Sparkles, ShieldCheck, Clock, Calendar, CheckCircle2, AlertCircle } from 'lucide-react';
+import { 
+  X, 
+  Sparkles, 
+  ShieldCheck, 
+  Clock, 
+  Calendar, 
+  CheckCircle2, 
+  AlertCircle, 
+  AlertTriangle,
+  Zap,
+  ArrowRight
+} from 'lucide-react';
 
 export default function RegularizeModal({ isOpen, onClose, targetEmployee, targetDay, isAdminMode }) {
   const { submitRegularization, directAdminRegularize, attendanceData } = useAttendance();
@@ -50,6 +61,43 @@ export default function RegularizeModal({ isOpen, onClose, targetEmployee, targe
   };
 
   const calculatedHours = calculateDuration(inTime, outTime);
+  const [hStr, mStr] = calculatedHours.split(':');
+  const durationTotalMinutes = (parseInt(hStr, 10) || 0) * 60 + (parseInt(mStr, 10) || 0);
+
+  // Policy Compliance Checks
+  const policyWarnings = [];
+  if (dayNum === 1) {
+    policyWarnings.push('Day 1 of the month is an automatic Week Off (WO) by company policy. Regularizing requires Admin override.');
+  }
+  if (dayNum % 7 === 6 && dayNum !== 27) { // Sunday check
+    policyWarnings.push(`Day ${dayNum} is a scheduled Sunday Week Off (WO). Only Day 27 (Last Sunday) is a scheduled working day.`);
+  }
+  if (currentEmp && currentEmp.offsUsed >= 4 && status === 'P') {
+    policyWarnings.push(`Employee has consumed ${currentEmp.offsUsed}/4 monthly offs. This regularization will be audited by Operations Admin.`);
+  }
+  if (durationTotalMinutes < 240) { // less than 4 hours
+    policyWarnings.push('Punch duration is under 4 hours. Shifts under 4 hours require supervisor justification.');
+  }
+
+  // Quick Preset Auto-Fills (AI Guided Assistant)
+  const applyPreset = (presetType) => {
+    if (presetType === 'FULL_DAY') {
+      setInTime('09:30');
+      setOutTime('18:30');
+      setReasonCategory('Biometric Sensor Malfunction');
+      setReasonText('Completed full regular telecalling shift (9h). Biometric reader did not capture timestamp.');
+    } else if (presetType === 'HALF_DAY') {
+      setInTime('09:30');
+      setOutTime('14:00');
+      setReasonCategory('Shift Punch In/Out Sync Issue');
+      setReasonText('Completed morning half-shift duty with Team Leader approval.');
+    } else if (presetType === 'FIELD_DUTY') {
+      setInTime('10:00');
+      setOutTime('19:00');
+      setReasonCategory('On-Duty / Client Escalation Meeting');
+      setReasonText('Assigned to official on-duty operations meeting.');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -91,20 +139,20 @@ export default function RegularizeModal({ isOpen, onClose, targetEmployee, targe
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs animate-fadeIn">
-      <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden relative">
+      <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden relative max-h-[90vh] flex flex-col">
         
-        {/* Header (Clean Light) */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50 shrink-0">
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-xl ${isAdminMode ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-indigo-50 text-indigo-700 border border-indigo-200'}`}>
               {isAdminMode ? <ShieldCheck className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
             </div>
             <div>
               <h3 className="font-bold text-base text-slate-900">
-                {isAdminMode ? 'Direct Admin Attendance Regularization' : 'Request Attendance Regularization'}
+                {isAdminMode ? 'Direct Admin Attendance Regularization' : 'Attendance & Regularization Assistant'}
               </h3>
               <p className="text-xs text-slate-500">
-                {isAdminMode ? 'Direct override stored in Cloudflare D1' : 'Directly forwards to Admin for instant review'}
+                {isAdminMode ? 'Direct override stored in Cloudflare D1' : 'Guided submission directly to Chief Admin approval queue'}
               </p>
             </div>
           </div>
@@ -124,10 +172,44 @@ export default function RegularizeModal({ isOpen, onClose, targetEmployee, targe
           </div>
         )}
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs">
+        {/* Scrollable Form Body */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 text-xs overflow-y-auto">
           
-          {/* Employee Selection */}
+          {/* AI Quick Preset Auto-Fills */}
+          <div className="p-3 bg-indigo-50/60 rounded-xl border border-indigo-100 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-[11px] text-indigo-900 flex items-center gap-1.5">
+                <Zap className="w-3.5 h-3.5 text-indigo-600" />
+                <span>AI Guided Auto-Fill (1-Tap):</span>
+              </span>
+              <span className="text-[10px] text-indigo-600 font-mono">Assisted Fill</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => applyPreset('FULL_DAY')}
+                className="px-2.5 py-1 rounded-lg bg-white hover:bg-indigo-100 border border-indigo-200 text-indigo-700 font-semibold text-[11px] transition-colors"
+              >
+                Standard Shift (09:30 - 18:30)
+              </button>
+              <button
+                type="button"
+                onClick={() => applyPreset('HALF_DAY')}
+                className="px-2.5 py-1 rounded-lg bg-white hover:bg-indigo-100 border border-indigo-200 text-indigo-700 font-semibold text-[11px] transition-colors"
+              >
+                Half-Day Shift (09:30 - 14:00)
+              </button>
+              <button
+                type="button"
+                onClick={() => applyPreset('FIELD_DUTY')}
+                className="px-2.5 py-1 rounded-lg bg-white hover:bg-indigo-100 border border-indigo-200 text-indigo-700 font-semibold text-[11px] transition-colors"
+              >
+                On-Duty Field Shift
+              </button>
+            </div>
+          </div>
+
+          {/* Employee & Day Selection */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-slate-700 font-bold mb-1">Employee</label>
@@ -253,16 +335,22 @@ export default function RegularizeModal({ isOpen, onClose, targetEmployee, targe
             />
           </div>
 
-          {/* Policy Notice */}
-          <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-600 flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
-            <div>
-              <span className="font-bold text-slate-900">Policy Reminder: </span>
-              Day 1 of the month is fixed as Week Off (WO). Sundays are Week Off except the last Sunday of the month which is a mandatory working day. All employee submissions are delivered directly to the Admin Dashboard for approval.
+          {/* Policy Compliance Checker: Real-Time Inline Warnings */}
+          {policyWarnings.length > 0 && (
+            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200 space-y-1.5 animate-in fade-in">
+              <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-900">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                <span>Policy Compliance Alert:</span>
+              </div>
+              {policyWarnings.map((warn, i) => (
+                <p key={i} className="text-[11px] text-amber-800 pl-5">
+                  • {warn}
+                </p>
+              ))}
             </div>
-          </div>
+          )}
 
-          {/* Actions */}
+          {/* Modal Actions */}
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
             <button
               type="button"
@@ -273,9 +361,10 @@ export default function RegularizeModal({ isOpen, onClose, targetEmployee, targe
             </button>
             <button
               type="submit"
-              className="px-5 py-2 rounded-lg font-bold text-white shadow-xs bg-indigo-600 hover:bg-indigo-700 transition-all"
+              className="flex items-center gap-1.5 px-5 py-2 rounded-lg font-bold text-white shadow-xs bg-indigo-600 hover:bg-indigo-700 transition-all cursor-pointer"
             >
-              {isAdminMode ? 'Apply Admin Override' : 'Send to Admin for Approval'}
+              <span>{isAdminMode ? 'Apply Admin Override' : 'One-Tap Submit to Admin'}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 

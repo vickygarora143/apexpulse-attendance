@@ -9,6 +9,7 @@ import HRDashboard from './components/HRDashboard';
 import RegularizeModal from './components/RegularizeModal';
 import UploadModal from './components/UploadModal';
 import ChangePasswordModal from './components/ChangePasswordModal';
+import HRChatbotWidget from './components/ai/HRChatbotWidget';
 
 function MainApp() {
   const { authUser, currentRole, currentUser } = useAttendance();
@@ -132,6 +133,9 @@ function MainApp() {
         isMandatory={!!authUser?.mustChangePassword}
         onClose={() => setChangePasswordModalOpen(false)}
       />
+
+      {/* Floating HR Helpdesk Chatbot Widget (English & Hindi) */}
+      <HRChatbotWidget onOpenRegularizeModal={handleOpenUserRegularize} />
 
     </div>
   );
