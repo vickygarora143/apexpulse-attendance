@@ -26,17 +26,10 @@ export default function TelecallerDashboard({ onOpenRegularizeModal }) {
   const myRequests = regularizations.filter(r => r.empCode === currentUser.code);
   const pendingRequests = myRequests.filter(r => r.status === 'PENDING');
 
-  // Quota calculation (4 Offs Monthly Policy)
-  const allowedOffs = 4;
-  const offsUsed = currentUser.offsUsed || 0;
-  const offsRemaining = currentUser.offsRemaining || 0;
-  const isOverLimit = currentUser.isOffLimitExceeded;
-  const percentUsed = Math.min(100, Math.round((offsUsed / allowedOffs) * 100));
-
   return (
     <div className="space-y-6">
       
-      {/* Profile Header & Off Quota Bar (Light Enterprise Card) */}
+      {/* Profile Header (Clean Light Enterprise Card) */}
       <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           
@@ -63,45 +56,15 @@ export default function TelecallerDashboard({ onOpenRegularizeModal }) {
             </div>
           </div>
 
-          {/* Quick Action: Request Regularization */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => onOpenRegularizeModal(currentUser, null)}
-              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-xs transition-all flex items-center gap-2"
-            >
-              <Send className="w-4 h-4" />
-              <span>Request Regularization</span>
-            </button>
+          <div className="text-xs text-slate-500 bg-slate-50 px-3.5 py-2 rounded-xl border border-slate-200">
+            <span className="font-semibold text-slate-700">Need attendance correction?</span> Click on any day card below to regularize directly.
           </div>
 
         </div>
 
-        {/* 4-Off Quota Tracker & Summary Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-100">
+        {/* Attendance Summary Metrics (Off Quota & Total Logged Time Removed) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-slate-100">
           
-          {/* 4-Off Monthly Quota */}
-          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
-            <div className="flex items-center justify-between text-xs mb-1.5">
-              <span className="text-slate-600 font-semibold">Monthly Off Quota (4 Max)</span>
-              <span className={`font-black ${isOverLimit ? 'text-rose-600' : 'text-emerald-700'}`}>
-                {offsUsed} / {allowedOffs} Used
-              </span>
-            </div>
-            {/* Progress bar */}
-            <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-              <div 
-                className={`h-full rounded-full transition-all duration-500 ${
-                  isOverLimit ? 'bg-rose-500' : offsUsed === 4 ? 'bg-amber-500' : 'bg-emerald-500'
-                }`}
-                style={{ width: `${percentUsed}%` }}
-              ></div>
-            </div>
-            <div className="flex items-center justify-between text-[10px] text-slate-500 mt-1.5 font-medium">
-              <span>{offsRemaining} Offs Remaining</span>
-              {isOverLimit && <span className="text-rose-600 font-bold">Policy Limit Exceeded!</span>}
-            </div>
-          </div>
-
           {/* Days Present */}
           <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
             <div>
@@ -113,14 +76,25 @@ export default function TelecallerDashboard({ onOpenRegularizeModal }) {
             </div>
           </div>
 
-          {/* Total Monthly Duration */}
+          {/* Days Absent */}
           <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
             <div>
-              <p className="text-xs text-slate-500 font-semibold">Total Logged Time</p>
-              <h4 className="text-xl font-black text-indigo-700 font-mono mt-0.5">{currentUser.totalHoursFormatted}</h4>
+              <p className="text-xs text-slate-500 font-semibold">Days Absent</p>
+              <h4 className="text-xl font-black text-rose-700 mt-0.5">{currentUser.absentDays} Days</h4>
+            </div>
+            <div className="p-2.5 rounded-lg bg-rose-100 text-rose-700">
+              <XCircle className="w-5 h-5" />
+            </div>
+          </div>
+
+          {/* Week Offs */}
+          <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-slate-500 font-semibold">Week Offs</p>
+              <h4 className="text-xl font-black text-indigo-700 mt-0.5">{currentUser.weekOffDays} Days</h4>
             </div>
             <div className="p-2.5 rounded-lg bg-indigo-100 text-indigo-700">
-              <Clock className="w-5 h-5" />
+              <Calendar className="w-5 h-5" />
             </div>
           </div>
 

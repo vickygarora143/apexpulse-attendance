@@ -117,15 +117,17 @@ export default function Navbar({ onOpenUpload, onOpenDirectAdminModal, onOpenCha
               </button>
             )}
 
-            {/* Upload Biometric CSV */}
-            <button
-              onClick={onOpenUpload}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-200 transition-all shadow-xs"
-              title="Upload Biometric CSV"
-            >
-              <Upload className="w-3.5 h-3.5 text-indigo-600" />
-              <span className="hidden sm:inline">Upload Biometric CSV</span>
-            </button>
+            {/* Upload Biometric CSV (Restricted to Admin & HR Only) */}
+            {(currentRole === 'admin' || currentRole === 'hr') && (
+              <button
+                onClick={onOpenUpload}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 rounded-lg border border-slate-200 transition-all shadow-xs"
+                title="Upload Biometric CSV"
+              >
+                <Upload className="w-3.5 h-3.5 text-indigo-600" />
+                <span className="hidden sm:inline">Upload Biometric CSV</span>
+              </button>
+            )}
 
             {/* Export CSV */}
             <button
@@ -247,27 +249,6 @@ export default function Navbar({ onOpenUpload, onOpenDirectAdminModal, onOpenCha
 
       </div>
 
-      {/* Roster Policies Ticker Bar (Crisp Light Theme) */}
-      <div className="bg-slate-100/90 border-t border-slate-200 py-1.5 px-4 text-[11px] text-slate-700">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500"></span>
-            <span className="font-bold text-slate-800">Company Policies:</span>
-            <span className="px-2 py-0.5 rounded-md bg-white text-blue-700 font-mono font-bold border border-slate-200 shadow-2xs">
-              1st Date = WO (Week Off)
-            </span>
-            <span className="px-2 py-0.5 rounded-md bg-white text-purple-700 font-mono font-bold border border-slate-200 shadow-2xs">
-              Sundays = WO (Except Last Sunday = WORKING)
-            </span>
-            <span className="px-2 py-0.5 rounded-md bg-white text-amber-700 font-mono font-bold border border-slate-200 shadow-2xs">
-              4 Monthly Offs Quota
-            </span>
-          </div>
-          <div className="text-slate-500 font-mono text-[10px]">
-            {attendanceData.dateRange} • {attendanceData.totalDays} Days • Cloudflare D1 Backend
-          </div>
-        </div>
-      </div>
     </header>
   );
 }
